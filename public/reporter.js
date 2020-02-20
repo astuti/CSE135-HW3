@@ -1,3 +1,15 @@
+// PUT THIS INSIDE YOUR BODY TAG AT THE BOTTOM 
+// <!-- The core Firebase JS SDK is always required and must be listed first -->
+// <script src="/__/firebase/7.8.2/firebase-app.js"></script>
+
+// <!-- TODO: Add SDKs for Firebase products that you want to use
+//      https://firebase.google.com/docs/web/setup#available-libraries -->
+// <script src="/__/firebase/7.8.2/firebase-analytics.js"></script>
+
+// <!-- Initialize Firebase -->
+// <script src="/__/firebase/init.js"></script>
+
+
 var idleObj = setTimeout(timeoutHandler, 2000); 
 var currentlyIdling = false;
 var idleStart, idleEnd, idleTime;
@@ -12,7 +24,7 @@ function gatherData(){
         () => PerformanceNavigationTiming 
         );
     
-    var newJSON = [{
+    var newJSON = {
             "id": uniqueKey,
             "#user-agent":  navigator.userAgent,
             "#user-lang"  : navigator.language,
@@ -38,14 +50,11 @@ function gatherData(){
             "#dynamic-keys":  JSON.stringify(keysPressed),
             "#dynamic-scroll":  JSON.stringify(scrollEvents),
             "#dynamic-idle":  JSON.stringify(idleEvents)
-    }];
-    if(localStorage.getItem('myEntries') != null){
-        var existingJSON = JSON.parse(localStorage.getItem('myEntries'));
-        existingJSON.push(newJSON[0]);
-        localStorage.setItem('myEntries', JSON.stringify(existingJSON));  
-    } else {
-        localStorage.setItem('myEntries', JSON.stringify(newJSON));  
-    }  
+    };
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "https://console.firebase.google.com/project/cse135-hw3-5f57c/overview", true);
+    xhttp.send(newJSON);
+
 }
 
 // There should be small 1x1 gif at the bottom of every page called check-image
@@ -82,7 +91,6 @@ function addListeners(){
 }
 
 
-
 function resetIdle(){
     clearTimeout(idleObj);
     idleObj = setTimeout(timeoutHandler, 2000); 
@@ -106,7 +114,6 @@ function logMove(e){
     mouseMoves.push([e.clientX, e.clientY]);
 }
 function storeData(e){
-    var existingJSON = JSON.parse(localStorage.getItem('myEntries'));
     gatherData();
 }
 
