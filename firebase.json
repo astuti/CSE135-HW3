@@ -1,7 +1,10 @@
 {
   "functions": {
-    "predeploy": [
-      
+    "rewrites": [
+      {
+        "source": "/api/v1/**",
+        "function": "webApi"
+      }
     ]
   }
 }

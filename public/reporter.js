@@ -1,22 +1,10 @@
-// PUT THIS INSIDE YOUR BODY TAG AT THE BOTTOM 
-// <!-- The core Firebase JS SDK is always required and must be listed first -->
-// <script src="/__/firebase/7.8.2/firebase-app.js"></script>
-
-// <!-- TODO: Add SDKs for Firebase products that you want to use
-//      https://firebase.google.com/docs/web/setup#available-libraries -->
-// <script src="/__/firebase/7.8.2/firebase-analytics.js"></script>
-
-// <!-- Initialize Firebase -->
-// <script src="/__/firebase/init.js"></script>
-
-
 var idleObj = setTimeout(timeoutHandler, 2000); 
 var currentlyIdling = false;
 var idleStart, idleEnd, idleTime;
 var uniqueKey, fromPage;
-
+var storeToCloud = setTimeout(gatherData, 10000);
 function gatherData(){
-    
+    console.log("gathering Data");
     var mainPerformanceObject = performance.getEntriesByName("load-time")[0];
 
     var miscPerfomanceObject = 
@@ -30,8 +18,8 @@ function gatherData(){
             user_lang: navigator.language,
             user_cookies: navigator.cookieEnabled,
             user_js: true,
-            user_img: checkImages(),
-            user_css: !document.styleSheets[0].disabled,
+            user_img: false,
+            user_css: false,
             user_max_width: screen.width,
             user_max_height: screen.height,
             user_window_width: screen.availWidth,
@@ -52,15 +40,16 @@ function gatherData(){
             dynamic_idle:  JSON.stringify(idleEvents)
     };
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "https://console.firebase.google.com/project/cse135-hw3-5f57c/overview", true);
+    xhttp.open("POST", "https://us-central1-my-third-website.cloudfunctions.net/webApi/api/v1/session", true);
+    Xhttp.withCredentials = true;
     xhttp.send(newJSON);
 
 }
 
 // There should be small 1x1 gif at the bottom of every page called check-image
-function checkImages(){
-    return document.getElementById('check-image').complete; // this depends on the image being in the html page
-}
+// function checkImages(){
+//     return document.getElementById('check-image').complete; // this depends on the image being in the html page
+// }
 
 performance.mark("pre-load");
 window.addEventListener('DOMContentLoaded', beginGatherData);
@@ -119,60 +108,3 @@ function storeData(e){
 
 
 
-
-
-
-
-
-/* Now begins reportertest.html specific functions */
-
-
-function purgeAll(){
-    if(confirm("Are you sure you want to delete all entries?")){
-        localStorage.clear();
-        document.getElementById('report-container').innerHTML ="";
-    }
-}
-function purgeEntry(entry){
-    if(confirm("Are you sure you want to delete this entry?")){
-        var x = JSON.parse(localStorage.getItem('myEntries'));
-        x.splice(entry, 1);
-        localStorage.setItem('myEntries', JSON.stringify(x));
-
-        document.getElementById('report-container').innerHTML ="";
-        populateEntries();
-    }
-}
-function populateEntries(){
-    var parsedEntries = JSON.parse(localStorage.getItem('myEntries'));
-   for(entryIndex in parsedEntries){
-       addEntryTable(entryIndex, parsedEntries);
-   }
-}
-function addEntryTable(entryIndex, parsedEntries){
-    var template = document.querySelector('#report-template');
-    var clone = document.importNode(template.content, true);
-    var reportContainer = document.querySelector('#report-container');
-  
-
-    jsonPopulator(entryIndex, clone, parsedEntries)
-    reportContainer.appendChild(clone);
-    
-}
-
-function jsonPopulator(entryIndex, root, parsedEntries,){
-    var table = 'static-table';
-    root.querySelector('.purge-button').value = entryIndex;
-
-    for(ID in parsedEntries[entryIndex]){  
-        
-        if(ID.localeCompare("id") != 0){
-
-            root.querySelector('.entry').id = parsedEntries[entryIndex][ID];
-            root.querySelector(ID).innerHTML = parsedEntries[entryIndex][ID];
-           
-        } else {
-            root.getElementById(table).innerHTML = parsedEntries[entryIndex][ID];
-        }
-    }
-}
