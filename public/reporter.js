@@ -30,8 +30,8 @@ function gatherData(){
             user_lang: navigator.language,
             user_cookies: navigator.cookieEnabled,
             user_js: true,
-            user_img: checkImages(),
-            user_css: !document.styleSheets[0].disabled,
+            user_img: false,
+            user_css: false,
             user_max_width: screen.width,
             user_max_height: screen.height,
             user_window_width: screen.availWidth,
@@ -51,21 +51,25 @@ function gatherData(){
             dynamic_scroll:  JSON.stringify(scrollEvents),
             dynamic_idle:  JSON.stringify(idleEvents)
     };
+    console.log("This is unload");
+    console.log("This is object: " + newJSON);
+
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "https://console.firebase.google.com/project/cse135-hw3-5f57c/overview", true);
-    xhttp.send(newJSON);
+    xhttp.open("POST", "https://us-central1-cse135-hw3-5f57c.cloudfunctions.net/webApi/api/v1/users");
+    xhttp.send({"yoshi":"Ichiiro"});
 
 }
 
 // There should be small 1x1 gif at the bottom of every page called check-image
-function checkImages(){
-    return document.getElementById('check-image').complete; // this depends on the image being in the html page
-}
+// function checkImages(){
+//     return document.getElementById('check-image').complete; // this depends on the image being in the html page
+//}
 
 performance.mark("pre-load");
 window.addEventListener('DOMContentLoaded', beginGatherData);
 
 function beginGatherData(){
+    console.log("This is begin gather data");
     performance.mark("post-load");
     performance.measure("load-time", "pre-load", "post-load");
     var path = window.location.pathname;
@@ -83,6 +87,7 @@ let keysPressed = [];
 let scrollEvents = [];
 let idleEvents = [];
 function addListeners(){
+    console.log("This is adding all listeners");
     window.addEventListener("click", e => resetIdle() | mouseClicks.push([e.clientX, e.clientY]) );
     window.addEventListener("mousemove", e =>  resetIdle() | mouseMoves.push([e.clientX, e.clientY]) );
     window.addEventListener("keyup", e => resetIdle() | keysPressed.push(e.key) );
@@ -144,6 +149,7 @@ function purgeEntry(entry){
     }
 }
 function populateEntries(){
+    console.log("This is populate");
     var parsedEntries = JSON.parse(localStorage.getItem('myEntries'));
    for(entryIndex in parsedEntries){
        addEntryTable(entryIndex, parsedEntries);
@@ -161,6 +167,7 @@ function addEntryTable(entryIndex, parsedEntries){
 }
 
 function jsonPopulator(entryIndex, root, parsedEntries,){
+    console.log("This is json populator");
     var table = 'static-table';
     root.querySelector('.purge-button').value = entryIndex;
 
