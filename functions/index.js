@@ -1,6 +1,14 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const express = require('express');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const cors = require('cors')({origin: true});
+const app = express();
 
+
+ 
+// Initialize Cloud Firestore through Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDLQ2jSupF_29teXCqwrctOHZg81faEQ0g",
     authDomain: "cse135-hw3-5f57c.firebaseapp.com",
@@ -12,38 +20,36 @@ const firebaseConfig = {
     measurementId: "G-3SGHBPR2LY"
 };
 
+   // Initialize App and create reference to our database
 admin.initializeApp(firebaseConfig);
 var firestore = admin.firestore();
-const docRef = firestore.doc("TestCollection/TestDoc");
+console.log("admin-firestore initialized");
 
-//"npm --prefix \"$RESOURCE_DIR\" run lint"
+// add path used for receiving requests
+app.use(cors);
+app.use(bodyParser.json());
+app.use(cookieParser());
+//exports.webApi = functions.https.onRequest(app);
 
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
 
-exports.functionTest = functions.https.onRequest((req, res) => {
-    docRef.get().then(snapshot => {
-        const data = snapshot.data();
-        res.send(data);
-    }).catch(error => {
-        console.log(error);
-        res.status(500).send(error);
+exports.getCookie = functions.https.onRequest((req, res) => {
+    
+    return cors(req, res, () => {
+        try {
+            res.setHeader("Access-Control-Allow-Methods", "GET", "POST");
+            res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+            res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+            res.setHeader("Access-Control-Allow-Credentials", true);
+            res.setHeader('Cache-Control', 'private');
+            //res.setHeader('content-type', 'application/json');
+            //res.cookie('f', 'f', { sameSite: 'none', secure: true, maxAge: 60000, httpOnly: true});
+            res.cookie('__session', 'sessiontest', {maxAge: 600000, httpOnly:true})
+            res.send(req.body);
+            
+            
+        } catch (error) {
+            res.status(500).send(error);
+        }
     });
-
-    docRef.update({
-        name: req.query.name2
-    }).catch(error => {
-        res.status(500).send(error);
-    });
-
-    // docRef.set({
-    //     flart: "shat"
-    // }).catch(error => {
-    //     res.status(500).send(error);
-    // });
 });
